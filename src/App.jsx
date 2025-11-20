@@ -3,11 +3,17 @@ import { useCallback, useState, useEffect, useMemo } from "react";
 import SearchInput from "./SearchInput";
 import ItemList from "./ItemList";
 import CounterButton from "./CounterButton";
+import MyContext from "./MyContext";
+import ChangeTheme from "./ChangeTheme";
 
 function App() {
   const [count, setCount] = useState(0);
   const [search, setSearch] = useState("");
   const [fullList, setFullList] = useState([]);
+  const [theme, setTheme] = useState("light");
+  const changeTheme = () => {
+    setTheme((prev) => (prev === "light" ? "dark" : "light"));
+  };
 
   const handleClick = useCallback(() => {
     setCount((prevCount) => prevCount + 1);
@@ -25,13 +31,20 @@ function App() {
     setFullList(list);
   }, []);
 
+  useEffect(() => {
+    document.body.className = theme;
+  }, [theme]);
+
   const filteredList = useMemo(() => {
     return fullList.filter((item) => item.name.includes(search));
   }, [fullList, search]);
 
   return (
     <>
-      <div>
+      <MyContext.Provider value={{ theme, changeTheme }}>
+        <ChangeTheme />
+      </MyContext.Provider>
+      <div style={{ margin: 20 }}>
         <CounterButton count={count} handleClick={handleClick} />
       </div>
       <SearchInput search={search} handleChange={handleChange} />
